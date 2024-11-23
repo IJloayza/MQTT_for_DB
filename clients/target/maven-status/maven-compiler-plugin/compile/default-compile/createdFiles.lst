@@ -1,0 +1,3 @@
+aws\connection\ClientDB.class
+aws\connection\ClientAws.class
+aws\connection\Topic.class
