@@ -16,7 +16,7 @@ public class Topic extends AWSIotTopic {
 
     @Override
     public void onMessage(AWSIotMessage message){
-        System.out.println("Message returned from AWS in Topic (" + message.getTopic() + "): " + message);
+        System.out.println("Message returned from AWS in Topic (" + message.getTopic() + "): " + message.getStringPayload());
         String uid = messageToString(message);
         System.out.println("Extracted UID: " + uid);
         sendMessageToBD(uid);
