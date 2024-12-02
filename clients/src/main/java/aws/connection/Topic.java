@@ -1,40 +1,38 @@
 package aws.connection;
 
 import java.sql.SQLException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.amazonaws.services.iot.client.AWSIotMessage;
 import com.amazonaws.services.iot.client.AWSIotQos;
 import com.amazonaws.services.iot.client.AWSIotTopic;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Topic extends AWSIotTopic {
-    private static final ObjectMapper obj = new ObjectMapper();
     public Topic(String topic,AWSIotQos qoso){
         super(topic, qoso);
     }
 
     @Override
     public void onMessage(AWSIotMessage message){
-        System.out.println("Message returned from AWS in Topic (" + message.getTopic() + "): " + message.getStringPayload());
-        String uid = messageToString(message);
+        String mPayload = message.getStringPayload();
+        System.out.println("Message returned from AWS in Topic (" + message.getTopic() + "): " + mPayload);
+        String uid = messageToUid(mPayload);
         System.out.println("Extracted UID: " + uid);
+        ClientAws.publishAws(uid);
+        
         sendMessageToBD(uid);
     }
 
-    private String messageToString(AWSIotMessage message) {
-        try {
-            // Payload converted to String
-            String payload = message.getStringPayload();
+    private String messageToUid(String message) {
 
-            // Transform the String in Json where we can find uid
-            JsonNode jsonNode = obj.readTree(payload);
-            //Returns the content in "uid" form the JSON
-            return jsonNode.get("uid").asText();
-        } catch (Exception e) {
-            System.err.println("Error parsing message payload: " + e.getMessage());
-            return null;
+        Pattern pattern = Pattern.compile("\"uid\":\\s*\"([^\"]+)\"");
+        Matcher matcher = pattern.matcher(message);
+        String uid = "";
+        if (matcher.find()) {
+            uid = matcher.group(1);
         }
+        return uid;  // Return: 53:cc:85:18
     }
     // This method use ClientDB to connect with database and create a uid
     private void sendMessageToBD(String uid){

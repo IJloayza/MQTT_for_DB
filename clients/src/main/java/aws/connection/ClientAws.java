@@ -10,6 +10,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.RSAPrivateKeySpec;
+import java.sql.SQLException;
 import java.util.Base64;
 
 import com.amazonaws.services.iot.client.AWSIotException;
@@ -21,7 +22,7 @@ import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 
 public class ClientAws{
-    private static final String FilePrivKey = "clients\\src\\main\\java\\aws\\certificates\\file-private.pem.key";
+    private static final String FilePrivKey = "clients/src/main/java/aws/certificates/file-private.pem.key";
     private static final String FileCertIot = "clients/src/main/java/aws/certificates/file-certificate.pem.crt";
     private static final String EndPoint = "a3hq611w41tavz-ats.iot.us-east-1.amazonaws.com";
     private static final String clientId = "manolete";
@@ -61,7 +62,7 @@ public class ClientAws{
         // Eliminar cabeceras y pies
         key = key.replace("-----BEGIN RSA PRIVATE KEY-----", "")
                  .replace("-----END RSA PRIVATE KEY-----", "")
-                 .replaceAll("\\s", ""); // Eliminar espacios y saltos de línea
+                 .replaceAll("\s", ""); // Eliminar espacios y saltos de línea
 
         // Decodificar Base64
         byte[] keyBytes = Base64.getDecoder().decode(key);
@@ -115,6 +116,23 @@ public class ClientAws{
             System.out.println(e.getMessage());
             e.printStackTrace();
             System.out.println("Error trying subscription in topic " + Topic);
+        }
+    }
+
+    public static void publishAws(String uid){
+        try {
+            String valid = ClientDB.isValidUid(uid)? "1" : "0";
+            String payload = "{\"answer\": \"" + valid + "\"}";
+            client.publish(Topic, payload);
+
+        } catch (AWSIotException e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+            System.out.println("Error trying to publish in topic " + Topic);
+        } catch (SQLException e){
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+            System.out.println("Error validating uid: " + uid);
         }
     }
 

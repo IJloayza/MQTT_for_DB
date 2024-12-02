@@ -1,21 +1,22 @@
 package aws.connection;
 
-import java.sql.Statement;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class ClientDB {
 
-    private static final String NOM_BASE_DE_DADES = "proj";
-    private static final String CADENA_DE_CONNEXIO = "jdbc:mysql://localhost:3306/" + NOM_BASE_DE_DADES;
+    private static final String NOM_BASE_DE_DADES = "XXX";
+    private static final String URL = "jdbc:postgresql://localhost:5432/" + NOM_BASE_DE_DADES;
     private static final String USER = "root";
-    private static final String CONTRASEÑA = "XXXXXX";
+    private static final String PASSWORD = "XXXXXX";
     private static Connection conn = null;
 
     public static void connect() throws SQLException {
         if (conn != null) return;   // is connected
-        conn = DriverManager.getConnection(CADENA_DE_CONNEXIO + USER + CONTRASEÑA);
+        conn = DriverManager.getConnection(URL + USER + PASSWORD);
     }
 
     public static void disconnect() throws SQLException {
@@ -24,22 +25,35 @@ public class ClientDB {
         conn = null;
     }
 
-    public static int addUID(String uid) throws SQLException {
-        String sql = String.format(
-                // Query to insert in table
-                "INSERT INTO alumno (UID) VALUES ('%s')",
-                uid);
-        int filasAfectadas;
-        Statement st = null;
-        try {
-            st = conn.createStatement();
-            filasAfectadas = st.executeUpdate(sql);
-        } finally {
-            
-            if (st != null) {
-                st.close();
+    public static boolean isValidUid(String uid) throws SQLException {
+    String queryUid = "SELECT COUNT(*) FROM Usuarios WHERE uid = ?";
+    
+    // Manejo automático de recursos con try-with-resources
+    try (PreparedStatement ps = conn.prepareStatement(queryUid)) {
+        // Asignar el parámetro
+        ps.setString(1, uid);
+
+        // Ejecutar la consulta y procesar el resultado
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1) > 0; // Devuelve true si el conteo es mayor que 0
             }
         }
-        return filasAfectadas;
+    }
+    return false;
+}
+
+    public static int addUID(String uid) throws SQLException {
+    // Usa una consulta parametrizada para evitar inyecciones SQL
+    String sql = "INSERT INTO alumno (UID) VALUES (?)";
+
+    // Manejo automático de recursos con try-with-resources
+    try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        // Asignar parámetro
+        ps.setString(1, uid);
+
+        // Ejecutar la consulta y devolver filas afectadas
+        return ps.executeUpdate();
+        }
     }
 }
