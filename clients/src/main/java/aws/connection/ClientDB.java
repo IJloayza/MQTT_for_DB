@@ -12,7 +12,7 @@ public class ClientDB {
 
     private static final String NOM_BASE_DE_DADES = "sistemas_ciclos";
     private static final String URL = "jdbc:postgresql://192.168.34.100:5432/" + NOM_BASE_DE_DADES;
-    private static final String USER = "adminitic";
+    private static final String USER = "aplicacions";
     private static final String PASSWORD = "admin";
     private static Connection conn = null;
 
