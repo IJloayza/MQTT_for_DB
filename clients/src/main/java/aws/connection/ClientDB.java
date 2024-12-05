@@ -18,7 +18,7 @@ public class ClientDB {
 
     public static void connect() throws SQLException {
         if (conn != null) return;   // is connected
-        conn = DriverManager.getConnection(URL + USER + PASSWORD);
+        conn = DriverManager.getConnection(URL , USER , PASSWORD);
     }
 
     public static void disconnect() throws SQLException {
