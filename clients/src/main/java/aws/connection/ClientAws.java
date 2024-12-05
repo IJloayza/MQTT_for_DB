@@ -62,7 +62,7 @@ public class ClientAws{
         // Eliminar cabeceras y pies
         key = key.replace("-----BEGIN RSA PRIVATE KEY-----", "")
                  .replace("-----END RSA PRIVATE KEY-----", "")
-                 .replaceAll("\s", ""); // Eliminar espacios y saltos de línea
+                 .replaceAll("\\s+", ""); // Eliminar espacios y saltos de línea
 
         // Decodificar Base64
         byte[] keyBytes = Base64.getDecoder().decode(key);
