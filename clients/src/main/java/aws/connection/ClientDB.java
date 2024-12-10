@@ -5,12 +5,13 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 public class ClientDB {
 
-    private static final String NOM_BASE_DE_DADES = "sistemas_ciclos";
+    private static final String NOM_BASE_DE_DADES = "sistema_ciclos";
     private static final String URL = "jdbc:postgresql://192.168.34.100:5432/" + NOM_BASE_DE_DADES;
     private static final String USER = "aplicacions";
     private static final String PASSWORD = "admin";
@@ -47,14 +48,12 @@ public class ClientDB {
 
     public static int addUID(String uid) throws SQLException {
     // Usa una consulta parametrizada para evitar inyecciones SQL
-    String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-    String sql = "INSERT INTO fecha (uid, horario) VALUES (?, ?)";
+    String sql = "INSERT INTO fecha (fecha_hora, estado_asistencia, ) VALUES (CURRENT_DATE, CURRENT_TIME, ?)";
 
     // Manejo automático de recursos con try-with-resources
     try (PreparedStatement ps = conn.prepareStatement(sql)) {
-        // Asignar parámetro
-        ps.setString(1, uid);
-        ps.setString(2, date);
+        // Asignar parámetrO
+        ps.setString(3, uid);
         // Ejecutar la consulta y devolver filas afectadas
         return ps.executeUpdate();
         }

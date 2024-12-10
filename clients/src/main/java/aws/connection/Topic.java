@@ -19,9 +19,10 @@ public class Topic extends AWSIotTopic {
         System.out.println("Message returned from AWS in Topic (" + message.getTopic() + "): " + mPayload);
         String uid = messageToUid(mPayload);
         System.out.println("Extracted UID: " + uid);
-        ClientAws.publishAws(uid);
-        
-        sendMessageToBD(uid);
+        boolean correct = ClientAws.publishAws(uid);
+        if(correct){
+            sendMessageToBD(uid);
+        }
     }
 
     private String messageToUid(String message) {

@@ -22,8 +22,8 @@ import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 
 public class ClientAws{
-    private static final String FilePrivKey = "clients/src/main/java/aws/certificates/file-private.pem.key";
-    private static final String FileCertIot = "clients/src/main/java/aws/certificates/file-certificate.pem.crt";
+    private static final String FilePrivKey = "/home/isard/MQTT_for_DB/clients/src/main/java/aws/certificates/file-private.pem.key";
+    private static final String FileCertIot = "/home/isard/MQTT_for_DB/clients/src/main/java/aws/certificates/file-certificate.pem.crt";
     private static final String EndPoint = "a3hq611w41tavz-ats.iot.us-east-1.amazonaws.com";
     private static final String clientId = "manolete";
     private static final String Topic = "node01/aws-arduino";
@@ -119,12 +119,15 @@ public class ClientAws{
         }
     }
 
-    public static void publishAws(String uid){
+    public static boolean publishAws(String uid){
+        boolean correct = false;
         try {
             String valid = ClientDB.isValidUid(uid)? "1" : "0";
             String payload = "{\"answer\": \"" + valid + "\"}";
             client.publish(Topic, payload);
-
+            if(valid.equals("1")){
+                correct = true;
+            }
         } catch (AWSIotException e) {
             System.out.println(e.getMessage());
             e.printStackTrace();
@@ -134,9 +137,10 @@ public class ClientAws{
             e.printStackTrace();
             System.out.println("Error validating uid: " + uid);
         }
+        return correct;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
         ClientAws.connectAws();
         ClientAws.subscribeAws();
     }
