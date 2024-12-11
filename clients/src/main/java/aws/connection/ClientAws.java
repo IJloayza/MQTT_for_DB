@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.util.Base64;
 
 import com.amazonaws.services.iot.client.AWSIotException;
+import com.amazonaws.services.iot.client.AWSIotMessage;
 import com.amazonaws.services.iot.client.AWSIotMqttClient;
 import com.amazonaws.services.iot.client.AWSIotQos;
 import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
@@ -128,7 +129,8 @@ public class ClientAws{
             }else if(!isvalid){
                 String valid = "0";
                 String payload = "{\"answer\": \"" + valid + "\"}";
-                client.publish(Topic, payload);
+                AWSIotMessage message = new NonBlockingPublishListener(Topic, QOS, payload);
+                client.publish(message);
             }
             
             
