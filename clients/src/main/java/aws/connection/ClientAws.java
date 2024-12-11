@@ -119,25 +119,24 @@ public class ClientAws{
         }
     }
 
-    public static boolean publishAws(String uid){
-        boolean correct = false;
+    public static void publishAws(boolean isvalid, String uid){
         try {
-            String valid = ClientDB.isValidUid(uid)? "1" : "0";
-            String payload = "{\"answer\": \"" + valid + "\"}";
-            client.publish(Topic, payload);
-            if(valid.equals("1")){
-                correct = true;
+            if(isvalid){
+                String valid = "1";
+                String payload = "{\"answer\": \"" + valid + "\"}";
+                client.publish(Topic, payload);
+            }else if(!isvalid){
+                String valid = "0";
+                String payload = "{\"answer\": \"" + valid + "\"}";
+                client.publish(Topic, payload);
             }
+            
+            
         } catch (AWSIotException e) {
             System.out.println(e.getMessage());
             e.printStackTrace();
             System.out.println("Error trying to publish in topic " + Topic);
-        } catch (SQLException e){
-            System.out.println(e.getMessage());
-            e.printStackTrace();
-            System.out.println("Error validating uid: " + uid);
         }
-        return correct;
     }
 
     public static void main(String[] args) throws SQLException {

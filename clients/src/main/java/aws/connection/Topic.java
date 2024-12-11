@@ -19,10 +19,9 @@ public class Topic extends AWSIotTopic {
         System.out.println("Message returned from AWS in Topic (" + message.getTopic() + "): " + mPayload);
         String uid = messageToUid(mPayload);
         System.out.println("Extracted UID: " + uid);
-        boolean correct = ClientAws.publishAws(uid);
-        if(correct){
-            sendMessageToBD(uid);
-        }
+        boolean changes = sendMessageToBD(uid);
+        ClientAws.publishAws(changes, (uid + " "));
+        
     }
 
     private String messageToUid(String message) {
@@ -36,15 +35,16 @@ public class Topic extends AWSIotTopic {
         return uid;  // Return: 53:cc:85:18
     }
     // This method use ClientDB to connect with database and create a uid
-    private void sendMessageToBD(String uid){
+    private boolean sendMessageToBD(String uid){
+        boolean db = false;
         try {
             ClientDB.connect();
-            ClientDB.addUID(uid);
+            db = ClientDB.addUID(uid);
             ClientDB.disconnect();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
             e.printStackTrace();
         }
-
+        return db;
     }
 }
