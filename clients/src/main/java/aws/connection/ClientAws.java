@@ -125,7 +125,8 @@ public class ClientAws{
             if(isvalid){
                 String valid = "1";
                 String payload = "{\"answer\": \"" + valid + "\"}";
-                client.publish(Topic, payload);
+                AWSIotMessage message = new NonBlockingPublishListener(Topic, QOS, payload);
+                client.publish(message);
             }else if(!isvalid){
                 String valid = "0";
                 String payload = "{\"answer\": \"" + valid + "\"}";

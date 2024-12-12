@@ -16,12 +16,13 @@ public class Topic extends AWSIotTopic {
     @Override
     public void onMessage(AWSIotMessage message){
         String mPayload = message.getStringPayload();
-        System.out.println("Message returned from AWS in Topic (" + message.getTopic() + "): " + mPayload);
-        String uid = messageToUid(mPayload);
-        System.out.println("Extracted UID: " + uid);
-        boolean changes = sendMessageToBD(uid);
-        ClientAws.publishAws(changes, (uid + " "));
-        
+        if(mPayload.contains("uid")){
+            System.out.println("Message returned from AWS in Topic (" + message.getTopic() + "): " + mPayload);
+            String uid = messageToUid(mPayload);
+            System.out.println("Extracted UID: " + uid);
+            boolean changes = sendMessageToBD(uid);
+            ClientAws.publishAws(changes, (uid + " "));
+        }
     }
 
     private String messageToUid(String message) {
@@ -36,6 +37,7 @@ public class Topic extends AWSIotTopic {
     }
     // This method use ClientDB to connect with database and create a uid
     private boolean sendMessageToBD(String uid){
+        if(uid.isBlank())return false;
         boolean db = false;
         try {
             ClientDB.connect();
